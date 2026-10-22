@@ -1,0 +1,42 @@
+<%- include('partials/header') %>
+<h2><%- icon('search') %> Search</h2>
+<form class="mini" method="get" action="/search">
+  <input name="q" value="<%= q %>" placeholder="Client, phone, cloth, color, product, bill no..." type="search" autofocus>
+  <button title="Search"><%- ic('search', 'Search') %></button>
+</form>
+<% const statusIcon = { Pending: 'clock', Ready: 'package', Delivered: 'check-circle' }; %>
+<% if (q && !rolls.length && !products.length && !orders.length) { %><p class="card muted">"<%= q %>" ke liye kuch nahi mila</p><% } %>
+
+<% if (orders.length) { %>
+<h3><%- icon('receipt') %> Orders (<%= orders.length %>)</h3>
+<% orders.forEach(o => { const late = o.status !== 'Delivered' && o.deliveryDate < today; %>
+<a class="item link s-<%= o.status %>" href="/orders/<%= o.id %>">
+  <div class="item-head">
+    <div><b><%= o.client %></b> <span class="muted"><%= o.bill %></span><br><span class="muted"><%= o.phone %> | <%- icon('truck') %> <%= fmtDate(o.deliveryDate) %></span></div>
+    <span><% if (late) { %><span class="badge b-Late"><%- icon('alert') %> Late</span><% } %> <span class="badge b-<%= o.status %>"><%- icon(statusIcon[o.status]) %> <%= o.status %></span></span>
+  </div>
+  <p class="money">Total <b>Rs <%= num(o.total) %></b> · <span class="<%= o.due > 0 ? 'low' : '' %>">Baaki Rs <%= num(o.due) %></span></p>
+</a>
+<% }) %>
+<% } %>
+
+<% if (rolls.length) { %>
+<h3><%- icon('package') %> Godown rolls (<%= rolls.length %>)</h3>
+<% rolls.forEach(r => { %>
+<a class="item link<%= (r.remaining || 0) <= 0 ? ' done' : '' %>" href="/godown?q=<%= encodeURIComponent(r.cloth) %>">
+  <div class="item-head"><div><b><%= r.cloth %> - <%= r.color %></b><br><span class="muted">Roll: <%= r.rollNo || '-' %><% if (r.supplier) { %> | <%= r.supplier %><% } %></span></div>
+  <div class="right"><b><%= num(r.remaining || 0) %> m</b><br><span class="muted">/ <%= num(r.total) %> m</span></div></div>
+</a>
+<% }) %>
+<% } %>
+
+<% if (products.length) { %>
+<h3><%- icon('shirt') %> Rack products (<%= products.length %>)</h3>
+<% products.forEach(p => { %>
+<a class="item link" href="/rack?q=<%= encodeURIComponent(p.name) %>">
+  <div class="item-head"><div><b><%= p.name %> <%= p.size || '' %></b><br><span class="muted"><%= [p.category, p.color].filter(Boolean).join(' | ') %> | Rs <%= num(p.price) %></span></div>
+  <b class="qty <%= p.qty < 3 ? 'low' : '' %>">x<%= p.qty %></b></div>
+</a>
+<% }) %>
+<% } %>
+<%- include('partials/footer') %>

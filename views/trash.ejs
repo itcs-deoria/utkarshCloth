@@ -1,0 +1,17 @@
+<%- include('partials/header') %>
+<h2><%- icon('trash') %> Trash</h2>
+<p class="muted">Delete kiya hua roll, product ya order yaha 30 din tak rehta hai. "Wapas lao" dabao to pehle jaisa ho jayega.</p>
+<% const kinds = { roll: ['package', 'Roll'], product: ['shirt', 'Product'], order: ['receipt', 'Order'] }; %>
+<% items.forEach(t => { const days = Math.max(0, 30 - Math.floor((Date.now() - t.deletedAt) / 86400000)); %>
+<div class="item">
+  <div class="item-head">
+    <div><span class="badge"><%- icon(kinds[t.kind][0]) %> <%= kinds[t.kind][1] %></span><br><b><%= t.label %></b><br><span class="muted">Delete: <%= fmtDate(t.deletedAt) %> | <%= days %> din baaki</span></div>
+  </div>
+  <div class="mini">
+    <form class="inline" method="post" action="/trash/<%= t.id %>/restore"><input type="hidden" name="_csrf" value="<%= locals.csrf %>"><button class="green-btn" title="Wapas lao"><%- ic('send', 'Wapas lao') %></button></form>
+    <form class="inline" method="post" action="/trash/<%= t.id %>/delete" data-confirm="Hamesha ke liye hata dein? Phir wapas nahi aayega"><input type="hidden" name="_csrf" value="<%= locals.csrf %>"><button class="red" title="Hamesha ke liye hatao"><%- ic('trash', 'Hamesha ke liye hatao') %></button></form>
+  </div>
+</div>
+<% }) %>
+<% if (!items.length) { %><p class="card muted"><%- icon('check-circle') %> Trash khali hai</p><% } %>
+<%- include('partials/footer') %>

@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+<h2><%- icon('plus') %> Naya Order</h2>
+<% const f = locals.form || {}; %>
+<form method="post" action="/orders" class="card">
+  <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+  <div class="form-grid">
+    <input name="client" value="<%= f.client || '' %>" placeholder="Client naam" required>
+    <input name="phone" type="tel" inputmode="tel" value="<%= f.phone || '' %>" placeholder="Phone" required>
+    <input name="address" value="<%= f.address || '' %>" placeholder="Address">
+    <label><%- icon('truck') %> Delivery date <input name="deliveryDate" type="date" value="<%= f.deliveryDate || '' %>" required></label>
+  </div>
+
+  <h3><%- icon('shirt') %> Items</h3>
+  <% if (!products.length) { %><p class="muted">Rack me abhi koi product stock me nahi hai. Pehle Rack me product add karo.</p><% } %>
+  <%- include('partials/item_rows', { f, products, avail: null }) %>
+
+  <h3><%- icon('rupee') %> Advance</h3>
+  <div class="form-grid">
+    <input name="advance" type="number" step="any" min="0" inputmode="decimal" value="<%= f.advance || '' %>" placeholder="Advance Rs">
+    <select name="mode"><% ['Cash', 'UPI'].forEach(m => { %><option<%= f.mode === m ? ' selected' : '' %>><%= m %></option><% }) %></select>
+  </div>
+  <button class="wide" title="Order save karo"><%- icon('check') %><span class="lbl">Order Save</span></button>
+</form>
+<%- include('partials/footer') %>

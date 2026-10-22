@@ -1,0 +1,50 @@
+<%- include('partials/header') %>
+<div class="actions noprint">
+  <button id="printbtn" title="Print"><%- ic('printer', 'Print') %></button>
+  <a class="btn green" href="<%= wa.bill %>" target="_blank" rel="noopener" title="Bill WhatsApp par bhejo"><%- ic('send', 'WhatsApp Bill') %></a>
+  <% if (wa.remind) { %><a class="btn orange" href="<%= wa.remind %>" target="_blank" rel="noopener" title="Payment reminder"><%- ic('alert', 'Reminder') %></a><% } %>
+  <a class="btn grey" href="/orders/<%= o.id %>" title="Order par wapas"><%- ic('x', 'Band') %></a>
+</div>
+
+<section class="bill">
+  <% if (o.due <= 0) { %><div class="stamp">PAID</div><% } %>
+  <div class="bill-head">
+    <div>
+      <h1><%= shop.name %></h1>
+      <p class="muted"><% if (shop.address) { %><%= shop.address %><br><% } %><% if (shop.phone) { %>Phone: <%= shop.phone %><br><% } %><% if (shop.gstin) { %>GSTIN: <%= shop.gstin %><% } %></p>
+    </div>
+    <div class="bill-meta">
+      <div class="bill-title">BILL</div>
+      No: <b><%= o.bill %></b><br>
+      Date: <%= fmtDate(o.created) %><br>
+      Delivery: <%= fmtDate(o.deliveryDate) %>
+    </div>
+  </div>
+
+  <div class="bill-to">
+    <span class="muted">Bill to</span><br>
+    <b><%= o.client %></b><br><%= o.phone %><% if (o.address) { %><br><%= o.address %><% } %>
+  </div>
+
+  <div class="table-wrap"><table class="bill-table">
+    <tr><th>#</th><th>Item</th><th class="n">Qty</th><th class="n">Rate</th><th class="n">Amount</th></tr>
+    <% o.items.forEach((i, k) => { %><tr><td><%= k + 1 %></td><td><%= i.name %></td><td class="n"><%= i.qty %></td><td class="n"><%= inr(i.rate) %></td><td class="n"><%= inr(i.qty * i.rate) %></td></tr><% }) %>
+  </table></div>
+
+  <div class="bill-totals">
+    <div><span>Total</span><b><%= inr(o.total) %></b></div>
+    <div><span>Mila (Paid)</span><span><%= inr(o.paid) %></span></div>
+    <div class="due"><span>Baaki (Due)</span><span><%= inr(Math.max(0, o.due)) %></span></div>
+  </div>
+
+  <% if (o.payments.length) { %>
+  <p class="muted bill-pay">Payments: <%= o.payments.map(p => fmtDate(p.date) + ' ' + inr(p.amount) + ' (' + p.mode + ')').join(' | ') %></p>
+  <% } %>
+  <% if (shop.upi && o.due > 0) { %><p class="bill-pay">UPI se payment: <b><%= shop.upi %></b></p><% } %>
+
+  <div class="bill-foot">
+    <p class="muted"><%= shop.note %></p>
+    <div class="sign">Signature</div>
+  </div>
+</section>
+<%- include('partials/footer') %>

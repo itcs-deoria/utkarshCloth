@@ -1,0 +1,18 @@
+<%- include('partials/header') %>
+<h2><%- icon('pencil') %> Items badlo</h2>
+<p><b><%= o.client %></b> <span class="muted">| <%= o.bill %> | Paid Rs <%= num(o.paid) %></span></p>
+<% const f = locals.form || {}; %>
+<form method="post" action="/orders/<%= o.id %>/items" class="card">
+  <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+  <h3><%- icon('shirt') %> Items</h3>
+  <p class="muted">Qty badlo, row hatao ya naya item jodo. Stock apne aap sahi ho jayega. Row hatane ke liye qty khali karo.</p>
+  <%- include('partials/item_rows', { f, products, avail }) %>
+  <% if (locked.length) { %>
+  <h3 class="gap"><%- icon('lock') %> Ye items badal nahi sakte</h3>
+  <p class="muted">Ye product ab rack me nahi hai, isliye jaise hain waise rahenge:</p>
+  <% locked.forEach(i => { %><p><%= i.name %> x <%= i.qty %> (Rs <%= num(i.rate) %>)</p><% }) %>
+  <% } %>
+  <button class="wide" title="Items save karo"><%- icon('check') %><span class="lbl">Items Save</span></button>
+</form>
+<a class="btn grey" href="/orders/<%= o.id %>" title="Wapas"><%- ic('x', 'Rehne do') %></a>
+<%- include('partials/footer') %>

@@ -1,0 +1,129 @@
+<%- include('partials/header') %>
+<h2><%- icon('shirt') %> Counter Rack</h2>
+<%
+// ---- Chhote helpers: rack/shelf/column ke rename, add, delete forms banate hain ----
+// Naam wale form (rename = pencil, add = plus)
+const nameForm = (action, hidden, placeholder, iconName, title) =>
+  `<form class="mini" method="post" action="${action}"><input type="hidden" name="_csrf" value="${locals.csrf}">${hidden || ''}` +
+  `<input name="name" placeholder="${placeholder}" required><button class="grey" title="${title}">${ic(iconName, title)}</button></form>`;
+// Delete form (confirm ke saath)
+const delForm = (action, hidden) =>
+  `<form class="mini" method="post" action="${action}" data-confirm="Pakka delete? Iske product ki location hat jayegi"><input type="hidden" name="_csrf" value="${locals.csrf}">${hidden || ''}<button class="red" title="Delete">${ic('trash', 'Delete')}</button></form>`;
+const hid = (name, value) => `<input type="hidden" name="${name}" value="${value}">`;
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+// Product ki location text: Rack / Shelf / Column
+const where = p => {
+  const rack = racks.find(r => String(r.id) === String(p.rack));
+  if (!rack) return '-';
+  const shelf = rack.shelves.id(p.shelf), col = shelf && shelf.columns.id(p.column);
+  return rack.name + ' / ' + (shelf ? shelf.name : '-') + ' / ' + (col ? col.name : '-');
+};
+
+// Location ke 3 dropdown (product add aur edit dono me). public/js/app.js shelf/column bharta hai
+const locSelects = p => `<select class="rk" name="rack"><option value="">-- Rack --</option>` +
+  racks.map(r => `<option value="${r.id}"${p && String(p.rack) === String(r.id) ? ' selected' : ''}>${esc(r.name)}</option>`).join('') +
+  `</select><select class="sh" name="shelf"></select><select class="cl" name="column"></select>`;
+%>
+
+<details class="card">
+  <summary title="Naya Rack add karo"><%- icon('plus') %><%- icon('archive') %><span class="lbl">Naya Rack add karo</span></summary>
+  <form method="post" action="/rack" class="mini">
+    <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+    <input name="name" placeholder="Naya Rack (jaise Left Rack)" required><button title="Rack add karo"><%- ic('check', 'Rack Add') %></button>
+  </form>
+</details>
+
+<% racks.forEach(k => { %>
+<section class="card">
+  <h3><%- icon('archive') %> <%= k.name %></h3>
+  <details class="tools"><summary title="Rack settings"><%- icon('settings') %><span class="lbl">Rack settings</span></summary>
+    <%- nameForm('/rack/' + k.id + '/rename', '', 'Rack ka naya naam', 'pencil', 'Rename') %>
+    <%- nameForm('/rack/' + k.id + '/add', '', 'Naya Shelf ka naam', 'plus', 'Shelf add') %>
+    <%- delForm('/rack/' + k.id + '/delete') %>
+  </details>
+
+  <% k.shelves.forEach(sh => { %>
+  <div class="shelf">
+    <b><%- icon('list') %> <%= sh.name %></b>
+    <details class="tools"><summary title="Shelf settings"><%- icon('settings') %><span class="lbl">Shelf settings</span></summary>
+      <%- nameForm('/rack/' + k.id + '/rename', hid('shelf', sh.id), 'Shelf ka naya naam', 'pencil', 'Rename') %>
+      <%- nameForm('/rack/' + k.id + '/add', hid('shelf', sh.id), 'Naya Column ka naam', 'plus', 'Column add') %>
+      <%- delForm('/rack/' + k.id + '/delete', hid('shelf', sh.id)) %>
+    </details>
+    <div class="cols">
+      <% sh.columns.forEach(c => { %>
+      <div class="col">
+        <b><%= c.name %></b>
+        <% products.filter(p => String(p.shelf) === String(sh.id) && String(p.column) === String(c.id)).forEach(p => { %>
+          <div class="muted">• <%= p.name %> <%= p.size || '' %> x<%= p.qty %></div>
+        <% }) %>
+        <details class="tools"><summary title="Column settings"><%- icon('settings') %><span class="lbl">Column settings</span></summary>
+          <%- nameForm('/rack/' + k.id + '/rename', hid('shelf', sh.id) + hid('col', c.id), 'Naya naam', 'pencil', 'Rename') %>
+          <%- delForm('/rack/' + k.id + '/delete', hid('shelf', sh.id) + hid('col', c.id)) %>
+        </details>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+  <% }) %>
+</section>
+<% }) %>
+<% if (!racks.length) { %><p class="muted">Pehle ek Rack add karo (upar), phir usme Shelf aur Column.</p><% } %>
+
+<details class="card">
+  <summary title="Naya product add karo"><%- icon('plus') %><%- icon('shirt') %><span class="lbl">Naya product add karo</span></summary>
+  <form method="post" action="/rack/product" class="form-grid loc-form">
+    <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+    <input name="name" placeholder="Product (T-Shirt, Pant...)" required>
+    <input name="category" placeholder="Category">
+    <select name="gender"><option>Boys</option><option>Girls</option><option>Unisex</option></select>
+    <input name="size" placeholder="Size">
+    <input name="color" placeholder="Color">
+    <input name="price" type="number" step="any" min="0" inputmode="decimal" placeholder="Price (Rs)" required>
+    <input name="qty" type="number" step="1" min="0" inputmode="numeric" placeholder="Qty" required>
+    <%- locSelects(null) %>
+    <button title="Product add karo"><%- ic('check', 'Product Add') %></button>
+  </form>
+</details>
+
+<form method="get" class="mini">
+  <input name="q" value="<%= q %>" placeholder="Product search" type="search"><button title="Search"><%- ic('search', 'Search') %></button>
+</form>
+
+<% products.forEach(p => { %>
+<div class="item">
+  <div class="item-head">
+    <div><b><%= p.name %></b> <span class="muted">(<%= p.gender || '-' %>)</span><br>
+      <span class="muted">Size: <%= p.size || '-' %> | Color: <%= p.color || '-' %> | Rs <%= num(p.price) %></span></div>
+    <div class="right"><b class="qty <%= p.qty < 3 ? 'low' : '' %>">x<%= p.qty %></b></div>
+  </div>
+  <p class="muted"><%- icon('pin') %> <%= where(p) %></p>
+
+  <form class="mini" method="post" action="/rack/product/<%= p.id %>/qty">
+    <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+    <input name="delta" type="number" step="1" inputmode="numeric" placeholder="Stock +/- (jaise 5 ya -2)" required><button title="Stock update"><%- ic('check', 'OK') %></button>
+  </form>
+
+  <details><summary title="Edit / Delete"><%- icon('pencil') %><span class="lbl">Edit / Delete</span></summary>
+    <form method="post" action="/rack/product/<%= p.id %>/edit" class="form-grid loc-form" data-shelf="<%= p.shelf || '' %>" data-col="<%= p.column || '' %>">
+      <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+      <input name="name" value="<%= p.name %>" placeholder="Product" required>
+      <input name="category" value="<%= p.category || '' %>" placeholder="Category">
+      <select name="gender"><% ['Boys', 'Girls', 'Unisex'].forEach(g => { %><option<%= p.gender === g ? ' selected' : '' %>><%= g %></option><% }) %></select>
+      <input name="size" value="<%= p.size || '' %>" placeholder="Size">
+      <input name="color" value="<%= p.color || '' %>" placeholder="Color">
+      <input name="price" type="number" step="any" min="0" inputmode="decimal" value="<%= p.price %>" placeholder="Price" required>
+      <%- locSelects(p) %>
+      <button title="Save"><%- ic('check', 'Save') %></button>
+    </form>
+    <form class="inline" method="post" action="/rack/product/<%= p.id %>/delete" data-confirm="Ye product delete karna hai?">
+      <input type="hidden" name="_csrf" value="<%= locals.csrf %>"><button class="red" title="Product delete"><%- ic('trash', 'Product Delete') %></button>
+    </form>
+  </details>
+</div>
+<% }) %>
+<% if (!products.length) { %><p class="muted">Koi product nahi mila</p><% } %>
+
+<script type="application/json" id="rackdata"><%- JSON.stringify(racks).replace(/</g, '\\u003c') %></script>
+<%- include('partials/footer') %>

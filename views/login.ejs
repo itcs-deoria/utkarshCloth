@@ -1,0 +1,12 @@
+<%- include('partials/header') %>
+<section class="card login">
+  <h2><%- icon('lock') %> Stock Manager</h2>
+  <% if (err) { %><p class="flash"><%- icon('alert') %><span><%= err %></span></p><% } %>
+  <form method="post">
+    <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+    <input name="user" placeholder="User" autocomplete="username" autocapitalize="none" required>
+    <input name="pass" type="password" placeholder="Password" autocomplete="current-password" required>
+    <button><%- icon('login') %><span class="lbl show">Login</span></button>
+  </form>
+</section>
+<%- include('partials/footer') %>

@@ -1,0 +1,66 @@
+<%- include('partials/header') %>
+<h2><%- icon('package') %> Godown</h2>
+
+<form class="mini" method="get" action="/godown">
+  <input name="q" value="<%= q %>" placeholder="Cloth, color, roll no ya supplier dhundo" type="search">
+  <button title="Search"><%- ic('search', 'Search') %></button>
+  <% if (q) { %><a class="btn grey" href="/godown" title="Search saaf karo"><%- ic('x', 'Saaf') %></a><% } %>
+</form>
+
+<details class="card">
+  <summary title="Naya roll add karo"><%- icon('plus') %><%- icon('package') %><span class="lbl">Naya roll add karo</span></summary>
+  <form method="post" class="form-grid">
+    <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+    <input name="rollNo" placeholder="Roll no">
+    <input name="cloth" placeholder="Cloth / Quality" required>
+    <input name="color" placeholder="Color" required>
+    <input name="supplier" placeholder="Supplier">
+    <input name="rate" type="number" step="any" min="0" inputmode="decimal" placeholder="Rate / meter">
+    <input name="total" type="number" step="any" min="0.1" inputmode="decimal" placeholder="Total meter" required>
+    <button title="Roll add karo"><%- ic('check', 'Roll Add') %></button>
+  </form>
+</details>
+
+<section class="card">
+  <h3><%- icon('list') %> Color-wise total</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Cloth - Color</th><th>Aaya (m)</th><th>Godown me (m)</th></tr>
+    <% Object.keys(sum).forEach(k => { %><tr><td><%= k %></td><td><%= num(sum[k].total) %></td><td><%= num(sum[k].remaining) %></td></tr><% }) %>
+  </table></div>
+  <% if (!Object.keys(sum).length) { %><p class="muted"><%= q ? 'Is search se koi roll nahi mila' : 'Abhi koi roll nahi' %></p><% } %>
+</section>
+
+<% rolls.forEach(r => { const left = r.remaining || 0, pct = Math.max(0, Math.min(100, left / r.total * 100)); %>
+<div class="item<%= left <= 0 ? ' done' : '' %>">
+  <div class="item-head">
+    <div><b><%= r.cloth %> - <%= r.color %></b><br><span class="muted">Roll: <%= r.rollNo || '-' %><% if (r.supplier) { %> | <%= r.supplier %><% } %><% if (r.rate) { %> | Rs <%= r.rate %>/m<% } %></span></div>
+    <div class="right"><% if (left <= 0) { %><span class="badge">Khatam</span><br><% } %><b><%= num(left) %> m</b><br><span class="muted">/ <%= num(r.total) %> m</span></div>
+  </div>
+  <div class="bar"><i class="<%= pct < 15 ? 'lo' : pct < 40 ? 'mid' : '' %>" style="width:<%= pct %>%"></i></div>
+  <% if (r.moves.length) { %><p class="muted"><%- icon('send') %> <%= r.moves.map(m => num(m.meter) + 'm' + (m.full ? ' (puraa)' : '')).join(', ') %></p><% } %>
+
+  <form method="post" action="/godown/<%= r.id %>/move" class="mini">
+    <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+    <input name="meter" type="number" step="any" min="0.01" inputmode="decimal" placeholder="Kitna meter office bheje">
+    <button title="Office bhejo"><%- ic('send', 'Bhejo') %></button>
+    <button name="full" value="1" class="grey" title="Puraa roll office bhejo" data-confirm="Puraa roll office bhejna hai?" formnovalidate><%- ic('package', 'Puraa roll') %></button>
+  </form>
+
+  <details>
+    <summary title="Edit / Delete"><%- icon('pencil') %><span class="lbl">Edit / Delete</span></summary>
+    <form method="post" action="/godown/<%= r.id %>/edit" class="form-grid">
+      <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+      <input name="rollNo" value="<%= r.rollNo || '' %>" placeholder="Roll no">
+      <input name="cloth" value="<%= r.cloth %>" placeholder="Cloth" required>
+      <input name="color" value="<%= r.color %>" placeholder="Color" required>
+      <input name="supplier" value="<%= r.supplier || '' %>" placeholder="Supplier">
+      <input name="rate" type="number" step="any" min="0" inputmode="decimal" value="<%= r.rate || '' %>" placeholder="Rate / meter">
+      <button title="Save"><%- ic('check', 'Save') %></button>
+    </form>
+    <form class="inline" method="post" action="/godown/<%= r.id %>/delete" data-confirm="Ye roll delete karna hai?">
+      <input type="hidden" name="_csrf" value="<%= locals.csrf %>"><button class="red" title="Roll delete"><%- ic('trash', 'Roll Delete') %></button>
+    </form>
+  </details>
+</div>
+<% }) %>
+<%- include('partials/footer') %>

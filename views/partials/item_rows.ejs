@@ -1,0 +1,19 @@
+<%
+// Item rows: product dropdown + qty + rate. "f" me pehle se bhari values (galti ke baad ya edit me)
+// "avail" ho (items badlo page) to stock wahi dikhta hai jo is order ke liye available hai
+const arr = x => [].concat(x === undefined ? [] : x);
+const ids = arr(f.product), qtys = arr(f.qty), rates = arr(f.rate), n = Math.max(1, ids.length);
+%>
+<div id="rows">
+  <% for (let k = 0; k < n; k++) { %>
+  <div class="row">
+    <select name="product">
+      <% products.forEach(p => { %><option value="<%= p.id %>"<%= String(ids[k]) === String(p.id) ? ' selected' : '' %>><%= p.name %> <%= p.size || '' %> (stock <%= avail ? avail[p.id] : p.qty %>, Rs <%= num(p.price) %>)</option><% }) %>
+    </select>
+    <input name="qty" type="number" step="1" min="1" inputmode="numeric" value="<%= qtys[k] || '' %>" placeholder="Qty">
+    <input name="rate" type="number" step="any" min="0" inputmode="decimal" value="<%= rates[k] || '' %>" placeholder="Rate (khali = default)">
+    <button type="button" class="red rmrow" title="Ye row hatao"><%- ic('x', 'Hatao') %></button>
+  </div>
+  <% } %>
+</div>
+<button type="button" id="addrow" class="grey" title="Item jodo"><%- ic('plus', 'Item jodo') %></button>

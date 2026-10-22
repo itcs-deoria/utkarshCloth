@@ -1,0 +1,57 @@
+<%- include('partials/header') %>
+<% const statusIcon = { Pending: 'clock', Ready: 'package', Delivered: 'check-circle' }; %>
+<div class="item-head">
+  <h2 class="plain"><%= o.client %></h2>
+  <span class="badge b-<%= o.status %>" title="<%= o.status %>"><%- icon(statusIcon[o.status]) %> <%= o.status %></span>
+</div>
+<p><a href="tel:<%= o.phone %>"><%- icon('phone') %> <%= o.phone %></a><br>
+  <% if (o.address) { %><%- icon('pin') %> <%= o.address %><br><% } %>
+  <span class="muted"><%- icon('truck') %> <%= fmtDate(o.deliveryDate) %></span></p>
+
+<form method="post" action="/orders/<%= o.id %>/status" class="mini">
+  <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+  <select name="status"><% ['Pending', 'Ready', 'Delivered'].forEach(x => { %><option<%= o.status === x ? ' selected' : '' %>><%= x %></option><% }) %></select>
+  <button title="Status update"><%- ic('check', 'Status Update') %></button>
+</form>
+
+<section class="card">
+  <div class="table-wrap"><table>
+    <tr><th>Item</th><th>Qty</th><th>Rate</th><th>Amount</th></tr>
+    <% o.items.forEach(i => { %><tr><td><%= i.name %></td><td><%= i.qty %></td><td><%= num(i.rate) %></td><td><%= num(i.qty * i.rate) %></td></tr><% }) %>
+  </table></div>
+  <h3 class="money"><%- icon('rupee') %> Total <%= num(o.total) %> · Paid <%= num(o.paid) %> · <span class="<%= o.due > 0 ? 'low' : '' %>">Baaki <%= num(o.due) %></span></h3>
+  <div class="bar pay"><i style="width:<%= o.total ? Math.min(100, o.paid / o.total * 100) : 0 %>%"></i></div>
+  <% o.payments.forEach(p => { %><p class="muted"><%= fmtDate(p.date) %>: Rs <%= num(p.amount) %> (<%= p.mode %>)</p><% }) %>
+  <% if (o.due > 0) { %>
+  <form method="post" action="/orders/<%= o.id %>/pay" class="mini">
+    <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+    <input name="amount" type="number" step="any" min="0.01" max="<%= o.due %>" inputmode="decimal" placeholder="Payment Rs" required>
+    <select name="mode"><option>Cash</option><option>UPI</option></select>
+    <button title="Payment add karo"><%- ic('plus', 'Payment Add') %></button>
+  </form>
+  <% } else { %><p class="muted"><%- icon('check-circle') %> Poora payment ho gaya</p><% } %>
+</section>
+
+<div class="actions noprint">
+  <a class="btn" href="/orders/<%= o.id %>/bill" target="_blank" rel="noopener" title="Bill dekho / print"><%- ic('printer', 'Bill / Print') %></a>
+  <a class="btn green" href="<%= wa.bill %>" target="_blank" rel="noopener" title="Bill WhatsApp par bhejo"><%- ic('send', 'WhatsApp Bill') %></a>
+  <% if (wa.remind) { %><a class="btn orange" href="<%= wa.remind %>" target="_blank" rel="noopener" title="Baaki paise ka reminder bhejo"><%- ic('alert', 'Payment Reminder') %></a><% } %>
+  <a class="btn grey" href="/orders/<%= o.id %>/items" title="Items badlo"><%- ic('pencil', 'Items badlo') %></a>
+</div>
+
+<details class="card">
+  <summary title="Client details badlo"><%- icon('pencil') %><span class="lbl">Client details badlo</span></summary>
+  <form method="post" action="/orders/<%= o.id %>/edit" class="form-grid">
+    <input type="hidden" name="_csrf" value="<%= locals.csrf %>">
+    <input name="client" value="<%= o.client %>" placeholder="Client naam" required>
+    <input name="phone" type="tel" value="<%= o.phone %>" placeholder="Phone" required>
+    <input name="address" value="<%= o.address || '' %>" placeholder="Address">
+    <label><%- icon('truck') %> Delivery date <input name="deliveryDate" type="date" value="<%= inputDate(o.deliveryDate) %>" required></label>
+    <button title="Save"><%- ic('check', 'Save') %></button>
+  </form>
+</details>
+
+<form class="inline" method="post" action="/orders/<%= o.id %>/delete" data-confirm="<%= o.status === 'Delivered' ? 'Order delete? (Delivered hai, stock wapas nahi aayega)' : 'Order delete? Stock wapas aa jayega' %>">
+  <input type="hidden" name="_csrf" value="<%= locals.csrf %>"><button class="red" title="Order delete"><%- ic('trash', 'Order Delete') %></button>
+</form>
+<%- include('partials/footer') %>

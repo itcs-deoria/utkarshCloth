@@ -1,0 +1,32 @@
+<%
+// Navbar me current page highlight: '/' sirf home par, baaki jagah startsWith
+const here = locals.path || '';
+const on = p => ((p === '/' ? here === '/' : here.startsWith(p)) ? 'on' : '');
+%><!DOCTYPE html>
+<html lang="hi"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Stock">
+<title>Stock Manager</title>
+<link rel="icon" href="<%- favicon %>">
+<link rel="stylesheet" href="/style.css">
+</head><body>
+<%- sprite %>
+<% if (locals.loggedIn) { %>
+<nav class="noprint">
+  <a class="<%= on('/') %>" href="/" title="Dashboard"><%- ic('home', 'Home') %></a>
+  <a class="<%= on('/godown') %>" href="/godown" title="Godown"><%- ic('package', 'Godown') %></a>
+  <a class="<%= on('/rack') %>" href="/rack" title="Counter Rack"><%- ic('shirt', 'Rack') %></a>
+  <a class="<%= on('/orders') %>" href="/orders" title="Orders"><%- ic('receipt', 'Orders') %></a>
+  <form method="post" action="/logout"><input type="hidden" name="_csrf" value="<%= locals.csrf %>"><button title="Logout"><%- ic('logout', 'Logout') %></button></form>
+</nav>
+<% } %>
+<main>
+<% if (locals.flash) { %><div class="flash"><%- icon('alert') %><span><%= flash %></span>
+  <% if (locals.undo) { %><form method="post" action="/trash/<%= undo %>/restore"><input type="hidden" name="_csrf" value="<%= locals.csrf %>"><button title="Delete wapas karo"><%- ic('send', 'Undo') %></button></form><% } %>
+</div><% } %>

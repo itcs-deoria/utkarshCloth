@@ -1,0 +1,33 @@
+<%- include('partials/header') %>
+<h2><%- icon('receipt') %> Orders</h2>
+<a class="btn" href="/orders/new" title="Naya Order"><%- icon('plus') %><%- icon('receipt') %><span class="lbl">Naya Order</span></a>
+
+<form class="mini" method="get" action="/orders">
+  <input name="q" value="<%= q %>" placeholder="Client naam ya phone se dhundo" type="search">
+  <button title="Search"><%- ic('search', 'Search') %></button>
+  <% if (q) { %><a class="btn grey" href="/orders" title="Search saaf karo"><%- ic('x', 'Saaf') %></a><% } %>
+</form>
+<% if (q) { %><p class="muted">"<%= q %>" ke liye saare orders me <%= orders.length %> mile</p><% } %>
+
+<div class="tabs">
+  <a class="<%= view === 'open' ? 'on' : '' %>" href="/orders" title="Chalu orders"><%- ic('clock', 'Chalu') %></a>
+  <a class="<%= view === 'Delivered' ? 'on' : '' %>" href="/orders?view=Delivered" title="Delivered orders"><%- ic('check-circle', 'Delivered') %></a>
+  <a class="<%= view === 'all' ? 'on' : '' %>" href="/orders?view=all" title="Sab orders"><%- ic('list', 'Sab') %></a>
+</div>
+
+<% const statusIcon = { Pending: 'clock', Ready: 'package', Delivered: 'check-circle' }; %>
+<% orders.forEach(o => { const late = o.status !== 'Delivered' && o.deliveryDate < today; %>
+<a class="item link s-<%= o.status %>" href="/orders/<%= o.id %>">
+  <div class="item-head">
+    <div><b><%= o.client %></b><br><span class="muted"><%= o.phone %> | <%- icon('truck') %> <%= fmtDate(o.deliveryDate) %></span></div>
+    <span>
+      <% if (late) { %><span class="badge b-Late"><%- icon('alert') %> Late</span><% } %>
+      <span class="badge b-<%= o.status %>" title="<%= o.status %>"><%- icon(statusIcon[o.status]) %> <%= o.status %></span>
+    </span>
+  </div>
+  <p class="money">Total <b>Rs <%= num(o.total) %></b> · Paid Rs <%= num(o.paid) %> · <span class="<%= o.due > 0 ? 'low' : '' %>">Baaki Rs <%= num(o.due) %></span></p>
+  <div class="bar pay"><i style="width:<%= o.total ? Math.min(100, o.paid / o.total * 100) : 0 %>%"></i></div>
+</a>
+<% }) %>
+<% if (!orders.length) { %><p class="muted">Koi order nahi</p><% } %>
+<%- include('partials/footer') %>

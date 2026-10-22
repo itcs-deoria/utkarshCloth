@@ -1,0 +1,183 @@
+/* Mobile-first: pehle phone ke liye likha hai, bade screen ke liye neeche @media me badlaav.
+   Simple rakha hai: bade button, icon + naam, rang se matlab (hara = theek, peela = dhyan, laal = zaroori) */
+:root { --c: #2563eb; --bg: #f4f6fb; --line: #e3e8f0; --text: #1b2433; --red: #dc2626; --green: #16a34a; --orange: #f59e0b; --muted: #667085; --r: 16px; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 17px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding-bottom: 84px; } /* neeche navbar ke liye jagah */
+main { max-width: 980px; margin: 0 auto; padding: 14px; }
+h2 { display: flex; align-items: center; gap: 10px; margin: 8px 0 14px; font-size: 1.45rem; }
+h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 1.1rem; }
+h3.gap { margin-top: 18px; }
+p { margin: 6px 0; }
+a { color: var(--c); }
+.muted { color: var(--muted); font-size: .92rem; }
+.right { text-align: right; white-space: nowrap; }
+.low { color: var(--red); font-weight: 700; }
+.money { font-size: 1rem; }
+.noprint {}
+
+/* ---- Icons: sab ek jaise, text ke rang me. Naam (.lbl) hamesha dikhta hai taaki koi confuse na ho ---- */
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.i { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -5px; }
+h2 .i { width: 40px; height: 40px; padding: 9px; border-radius: 12px; background: var(--c); color: #fff; vertical-align: middle; }
+h2.plain { font-size: 1.3rem; margin: 0 0 6px; }
+h3 .i { color: var(--c); }
+.lbl { margin-left: 6px; font-weight: 600; }
+.lbl.show { }
+
+/* ---- Navbar: phone par neeche (angoothe se aasan), bade screen par upar. Icon + naam ---- */
+nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; display: flex; background: #fff; border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); box-shadow: 0 -2px 12px #0000000f; }
+nav a, nav button { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 64px; padding: 4px 0; color: #667085; text-decoration: none; background: none; border: 0; border-radius: 0; font-size: .74rem; }
+nav .i { width: 26px; height: 26px; }
+nav .lbl { margin: 0; font-size: .74rem; }
+nav a.on { color: var(--c); background: #eff4ff; box-shadow: inset 0 3px 0 var(--c); }
+nav form { flex: 1; display: flex; margin: 0; }
+
+/* ---- Cards ---- */
+section.card, .card, .item { display: block; background: #fff; border: 1px solid var(--line); border-radius: var(--r); padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 6px #1b24330d; }
+.item { margin-bottom: 10px; }
+a.item { color: inherit; text-decoration: none; }
+.item-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px; }
+.grid .card { margin: 0; }
+.item.s-Pending { border-left: 6px solid var(--orange); }
+.item.s-Ready { border-left: 6px solid var(--c); }
+.item.s-Delivered { border-left: 6px solid var(--green); }
+.item.done { opacity: .6; }
+
+/* ---- Dashboard: bade rangeen dabbe ---- */
+.tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 12px; }
+.tile { display: flex; flex-direction: column; gap: 2px; padding: 14px; border-radius: var(--r); color: #fff; text-decoration: none; box-shadow: 0 3px 8px #1b24331a; }
+.tile .i { width: 30px; height: 30px; margin-bottom: 4px; }
+.tile b { font-size: 2rem; line-height: 1.1; }
+.tile b.sm { font-size: 1.45rem; padding: 5px 0; }
+.tile span { font-size: .92rem; opacity: .95; }
+.t-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.t-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+.t-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.t-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.tile.zero { background: linear-gradient(135deg, #34d399, #16a34a); } /* kuch baaki nahi = hara */
+.actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.actions .btn { min-height: 56px; }
+
+/* ---- Forms: 16px+ font (iPhone zoom nahi karega), bade tap area ---- */
+input, select, button, .btn { font: inherit; font-size: 16px; }
+input, select { width: 100%; min-height: 48px; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 12px; background: #fff; }
+input:focus, select:focus { outline: 3px solid #bfdbfe; border-color: var(--c); }
+label { display: block; font-size: .88rem; color: var(--muted); }
+label input { margin-top: 2px; }
+button, .btn { display: inline-flex; align-items: center; justify-content: center; gap: 2px; min-height: 48px; min-width: 48px; padding: 0 16px; border: 0; border-radius: 12px; background: var(--c); color: #fff; font-weight: 600; cursor: pointer; text-decoration: none; }
+button:active, .btn:active { filter: brightness(.9); }
+button.red { background: var(--red); }
+button.grey, .btn.grey { background: #e8edf5; color: var(--text); }
+button.wide { width: 100%; margin-top: 14px; min-height: 54px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 10px 0; align-items: end; }
+.mini { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; } /* ek line ka chhota form */
+.mini input, .mini select { flex: 1 1 140px; min-width: 0; width: auto; }
+form.inline { display: inline; }
+.login { max-width: 380px; margin: 40px auto; padding: 22px; }
+.login input, .login button { width: 100%; margin-bottom: 10px; }
+.login h2 { justify-content: center; }
+
+/* ---- Order ke item rows ---- */
+.row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--line); }
+.row select { grid-column: 1 / -1; }
+#addrow { margin-bottom: 8px; }
+
+/* ---- Tables (chhote hain, zarurat par side me scroll) ---- */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 9px 8px; border-bottom: 1px solid var(--line); text-align: left; }
+th { background: #f1f5fb; font-size: .88rem; color: var(--muted); }
+
+/* ---- Chhoti cheezein ---- */
+/* details ka button (tap karne par khulta hai) */
+details > summary { display: inline-flex; align-items: center; gap: 4px; min-height: 48px; padding: 0 16px; border-radius: 12px; background: #e8edf5; color: var(--text); font-weight: 600; cursor: pointer; list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+details[open] > summary { background: var(--c); color: #fff; margin-bottom: 10px; }
+.tools summary { min-height: 40px; padding: 0 12px; }
+.flash { display: flex; gap: 8px; align-items: flex-start; background: #fff8e1; border: 1px solid #f0d78c; padding: 12px 14px; border-radius: 12px; margin-bottom: 12px; }
+.bar { height: 12px; background: #e8edf5; border-radius: 99px; overflow: hidden; margin: 8px 0; }
+.bar i { display: block; height: 100%; background: var(--green); border-radius: 99px; }
+.bar i.mid { background: var(--orange); }
+.bar i.lo { background: var(--red); }
+.bar.pay i { background: var(--c); } /* kitna paisa mil chuka */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 11px; border-radius: 99px; font-size: .82rem; font-weight: 700; white-space: nowrap; background: #e8edf5; }
+.b-Pending { background: #fef3c7; color: #92400e; }
+.b-Ready { background: #dbeafe; color: #1e40af; }
+.b-Delivered { background: #dcfce7; color: #166534; }
+.b-Late { background: #fee2e2; color: var(--red); }
+.qty { display: inline-block; min-width: 48px; text-align: center; padding: 4px 12px; border-radius: 99px; background: #dcfce7; color: #166534; font-weight: 700; }
+.qty.low { background: #fee2e2; color: var(--red); }
+.tabs { display: flex; gap: 8px; margin: 12px 0; }
+.tabs a { flex: 1; display: flex; justify-content: center; align-items: center; min-height: 48px; border-radius: 12px; background: #e8edf5; text-decoration: none; color: var(--text); }
+.tabs a.on { background: var(--c); color: #fff; }
+
+/* ---- Rack: shelf aur column ---- */
+.shelf { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 10px; }
+.cols { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 8px; }
+.col { border: 2px dashed #b9c4d0; border-radius: 12px; padding: 10px; background: #fafcfe; }
+
+.badge .i { width: 15px; height: 15px; vertical-align: -3px; }
+.muted .i, p .i, label .i { width: 17px; height: 17px; vertical-align: -3px; }
+.tile .i { width: 30px; height: 30px; vertical-align: baseline; }
+
+/* ---- Bade screen (tablet / laptop): navbar upar ---- */
+@media (min-width: 760px) {
+  body { padding-bottom: 0; }
+  main { padding: 22px; }
+  nav { position: sticky; top: 0; bottom: auto; border-top: 0; border-bottom: 1px solid var(--line); padding: 0 12px; box-shadow: 0 2px 10px #0000000f; }
+  nav a, nav button { flex: 0 0 auto; flex-direction: row; gap: 8px; min-height: 58px; padding: 0 22px; font-size: 1rem; }
+  nav .lbl { font-size: 1rem; }
+  nav .i { width: 24px; height: 24px; }
+  nav a.on { box-shadow: inset 0 -3px 0 var(--c); }
+  nav form { flex: 0 0 auto; margin-left: auto; }
+  .tiles { grid-template-columns: repeat(4, 1fr); }
+  .row { grid-template-columns: 3fr 1fr 1fr auto; }
+  .row select { grid-column: auto; }
+}
+
+/* ---- Print: bill par navbar, button wagairah nahi ---- */
+@media print {
+  nav, .noprint, button { display: none !important; }
+  body { background: #fff; padding: 0; }
+  .card { border: 0; box-shadow: none; }
+  h2 .i { display: none; }
+}
+
+/* ---- WhatsApp / reminder button ---- */
+.btn.green { background: #16a34a; color: #fff; }
+.btn.orange { background: #f59e0b; color: #fff; }
+
+/* ---- Bill (A4 par print hone layak) ---- */
+.bill { position: relative; max-width: 820px; margin: 0 auto 14px; padding: 22px; background: #fff; border: 1px solid var(--line); border-radius: var(--r); }
+.bill-head { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-bottom: 12px; margin-bottom: 14px; border-bottom: 3px solid var(--c); }
+.bill-head h1 { margin: 0 0 4px; font-size: 1.7rem; color: var(--c); }
+.bill-head p { margin: 0; }
+.bill-meta { text-align: right; font-size: .95rem; }
+.bill-title { font-weight: 800; letter-spacing: .2em; color: var(--muted); font-size: 1.1rem; }
+.bill-to { margin-bottom: 14px; }
+.bill-table th { background: var(--c); color: #fff; font-size: .85rem; }
+.bill-table th.n, .bill-table td.n { text-align: right; }
+.bill-totals { margin: 12px 0 0 auto; width: min(100%, 300px); }
+.bill-totals div { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.bill-totals .due { font-weight: 800; font-size: 1.15rem; color: var(--red); border-bottom: 0; }
+.bill-pay { margin: 12px 0 0; font-size: .9rem; }
+.bill-foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-top: 34px; }
+.sign { min-width: 170px; padding-top: 4px; border-top: 1px solid #667085; text-align: center; font-size: .85rem; color: var(--muted); }
+.stamp { position: absolute; right: 24px; top: 130px; transform: rotate(-14deg); padding: 0 16px; border: 4px solid var(--green); border-radius: 10px; color: var(--green); font-size: 2rem; font-weight: 800; letter-spacing: .1em; opacity: .5; pointer-events: none; }
+
+@media print {
+  .bill { border: 0; padding: 0; max-width: none; }
+  .bill-table th, .stamp, .bill-head { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @page { margin: 14mm; }
+}
+
+/* ---- hidden attribute hamesha chhupaye (card/button ke display ko override kare) ---- */
+[hidden] { display: none !important; }
+
+/* ---- Undo wala flash aur Trash ---- */
+.flash { align-items: center; }
+.flash span { flex: 1; }
+.flash form { margin: 0; }
+.flash button { min-height: 40px; background: var(--c); }
+.green-btn { background: var(--green); }

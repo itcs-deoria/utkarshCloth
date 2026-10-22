@@ -1,0 +1,55 @@
+<%- include('partials/header') %>
+<h2><%- icon('home') %> Dashboard</h2>
+
+<form class="mini noprint" method="get" action="/search">
+  <input name="q" placeholder="Sab me dhundo: client, phone, cloth, product, bill no" type="search">
+  <button title="Search"><%- ic('search', 'Search') %></button>
+</form>
+
+<div class="card noprint" id="install" hidden>
+  <h3><%- icon('home') %> App install karo</h3>
+  <p class="muted">Phone ki home screen par app jaisa icon aa jayega aur seedha khulega.</p>
+  <button id="installbtn" type="button"><%- ic('check', 'Install karo') %></button>
+  <p id="iostip" hidden>iPhone me: Safari me neeche <b>Share</b> button dabao, phir <b>Add to Home Screen</b>.</p>
+</div>
+
+<div class="tiles">
+  <a class="tile t-red<%= late.length ? '' : ' zero' %>" href="#late"><%- icon('alert') %><b><%= late.length %></b><span>Late delivery</span></a>
+  <a class="tile t-blue<%= today.length ? '' : ' zero' %>" href="#today"><%- icon('truck') %><b><%= today.length %></b><span>Aaj ki delivery</span></a>
+  <a class="tile t-purple<%= pending.length ? '' : ' zero' %>" href="#due"><%- icon('rupee') %><b class="sm">Rs <%= dueTotal.toLocaleString('en-IN') %></b><span>Baaki paisa</span></a>
+  <a class="tile t-orange<%= (lowRolls.length + lowProducts.length) ? '' : ' zero' %>" href="#low"><%- icon('package') %><b><%= lowRolls.length + lowProducts.length %></b><span>Kam stock</span></a>
+</div>
+
+<div class="actions noprint">
+  <a class="btn" href="/orders/new"><%- icon('plus') %><span class="lbl">Naya Order</span></a>
+  <a class="btn grey" href="/godown"><%- icon('package') %><span class="lbl">Godown</span></a>
+  <a class="btn grey" href="/rack"><%- icon('shirt') %><span class="lbl">Rack</span></a>
+  <a class="btn grey" href="/trash"><%- icon('trash') %><span class="lbl">Trash</span></a>
+</div>
+
+<div class="grid">
+  <section class="card" id="late">
+    <h3><%- icon('alert') %> Late delivery</h3>
+    <% late.forEach(o => { %><p><a href="/orders/<%= o.id %>"><b><%= o.client %></b></a> <span class="muted">(<%= fmtDate(o.deliveryDate) %>)</span><br><a href="tel:<%= o.phone %>"><%- icon('phone') %> <%= o.phone %></a></p><% }) %>
+    <% if (!late.length) { %><p class="muted"><%- icon('check') %> Koi late nahi</p><% } %>
+  </section>
+  <section class="card" id="today">
+    <h3><%- icon('truck') %> Aaj ki delivery</h3>
+    <% today.forEach(o => { %><p><a href="/orders/<%= o.id %>"><b><%= o.client %></b></a><br><a href="tel:<%= o.phone %>"><%- icon('phone') %> <%= o.phone %></a></p><% }) %>
+    <% if (!today.length) { %><p class="muted"><%- icon('check') %> Aaj koi delivery nahi</p><% } %>
+  </section>
+  <section class="card" id="due">
+    <h3><%- icon('rupee') %> Baaki paisa</h3>
+    <% pending.forEach(o => { %><p><a href="/orders/<%= o._id %>"><b><%= o.client %></b></a><br><span class="low">Rs <%= num(o.due) %></span></p><% }) %>
+    <% if (!pending.length) { %><p class="muted"><%- icon('check') %> Koi baaki nahi</p><% } %>
+  </section>
+  <section class="card" id="low">
+    <h3><%- icon('package') %> Kam roll</h3>
+    <% lowRolls.forEach(r => { %><p><b><%= r.cloth %> <%= r.color %></b> <span class="muted"><%= r.rollNo || '' %></span><br><span class="low"><%= num(r.remaining) %> m</span> bacha</p><% }) %>
+    <% if (!lowRolls.length) { %><p class="muted"><%- icon('check') %> Sab theek hai</p><% } %>
+    <h3 class="gap"><%- icon('shirt') %> Kam product</h3>
+    <% lowProducts.forEach(p => { %><p><b><%= p.name %> <%= p.size || '' %></b><br><span class="low">x<%= p.qty %></span></p><% }) %>
+    <% if (!lowProducts.length) { %><p class="muted"><%- icon('check') %> Sab theek hai</p><% } %>
+  </section>
+</div>
+<%- include('partials/footer') %>
